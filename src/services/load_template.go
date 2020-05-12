@@ -19,7 +19,7 @@ func LoadTemplate(templateRoot, destination string, args []string) {
 	}
 
 	variablesPath := path.Join(templateRoot, "_variables.json")
-	recipePath := path.Join(templateRoot, "_recipe.json")
+	recipePath := path.Join(templateRoot, "_recipes.json")
 
 	variablesContent, err := ioutil.ReadFile(variablesPath)
 	if err != nil {
@@ -46,18 +46,12 @@ func LoadTemplate(templateRoot, destination string, args []string) {
 	reader := bufio.NewReader(os.Stdin)
 
 	for i, v := range variableNames {
-		def := ""
 		if len(args) > i {
-			def = args[i]
-			fmt.Printf("%s (%s): ", v, def)
+			variables[v] = args[i]
 		} else {
 			fmt.Printf("%s: ", v)
-		}
-		val, _ := reader.ReadString('\n')
-		val = strings.Trim(val, " \n\t\r")
-		if val == "" {
-			variables[v] = def
-		} else {
+			val, _ := reader.ReadString('\n')
+			val = strings.Trim(val, " \n\t\r")
 			variables[v] = val
 		}
 	}
