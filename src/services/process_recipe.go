@@ -3,7 +3,7 @@ package services
 import (
 	"bytes"
 	"github.com/mobaetzel/temple/src/models"
-	"html/template"
+	"text/template"
 	"io/ioutil"
 	"log"
 	"os"
