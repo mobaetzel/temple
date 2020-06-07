@@ -1,0 +1,58 @@
+html {
+  font-size: 16px;
+  word-spacing: 1px;
+  -ms-text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: url('/assets/background.svg') !important;
+  background-repeat: repeat !important;
+  background-size: 512px 512px !important;
+  background-color: #FAFAFA !important;
+}
+
+.page-content {
+  background-color: white;
+  padding: 3em !important;
+  margin-top: 15vh;
+  border-radius: 0.5em;
+}
+
+.btn:focus {
+  box-shadow: none !important;
+}
+
+@media screen and (max-width: 48em) {
+  .page-content {
+    padding: 2em !important;
+  }
+}
+
+@media screen and (max-width: 32em) {
+  .page-content {
+    padding: 1em !important;
+  }
+}
+
+@media screen and (max-width: 24em) {
+  .page-content {
+    padding: 0.5em !important;
+  }
+}
+
+@media print {
+  .page-content {
+    background: none !important;
+  }
+}

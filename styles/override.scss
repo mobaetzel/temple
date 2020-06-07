@@ -1,0 +1,16 @@
+$theme-colors: () !default;
+$theme-colors: map-merge(
+    (
+      'primary': #386FA4,
+      'secondary': #F9DC5C,
+      'dark': #133C55,
+    ),
+    $theme-colors
+);
+
+$font-family-base: 'Nunito', sans-serif;
+$font-family-sans-serif: 'Nunito Sans', sans-serif;
+$font-family-monospace: Consolas, Monaco,'Andale Mono','Ubuntu Mono', monospace;
+
+@import '~bootstrap/scss/bootstrap.scss';
+@import '~bootstrap-vue/src/index.scss';
