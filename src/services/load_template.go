@@ -1,83 +1,41 @@
 package services
 
 import (
-	"bufio"
 	"encoding/json"
-	"fmt"
 	"github.com/mobaetzel/temple/src/models"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"strings"
 )
 
-// Load a template by its path
-func LoadTemplate(templateRoot, destination string, args []string) {
+const TemplateConfigFileName = ".template.json"
+
+// Load a template by its path.
+func LoadTemplate(templateRoot string) models.Template {
 	checkTemplateFolder(templateRoot)
-
-	variableNames := getVariables(templateRoot)
-	recipes := getRecipes(templateRoot)
-
-	variables := defineVariables(variableNames, args)
-
-	for _, r := range recipes {
-		ProcessRecipe(templateRoot, destination, r, variables)
-	}
+	return parseTemplateConfig(templateRoot)
 }
 
 // Check if the given template exists.
 func checkTemplateFolder(templateRoot string) {
-	_, err := os.Stat(templateRoot)
+	_, err := os.Stat(path.Join(templateRoot, TemplateConfigFileName))
 	if err != nil {
 		log.Fatalf("Failed to load template: %s\n", templateRoot)
 	}
 }
 
-func getVariables(templateRoot string) []string {
-	variablesPath := path.Join(templateRoot, "_variables.json")
-	variablesContent, err := ioutil.ReadFile(variablesPath)
+// Load the template config file and parse the content into a template model.
+func parseTemplateConfig(templateRoot string) models.Template {
+	configFilePath := path.Join(templateRoot, TemplateConfigFileName)
+	configFileContent, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		log.Fatalf("Template %s has no variables defined\n", templateRoot)
+		log.Fatalf("Could not read the template config file %s\n", configFilePath)
 	}
-	var variables []string
-	err = json.Unmarshal([]byte(variablesContent), &variables)
+	var template models.Template
+	err = json.Unmarshal(configFileContent, &template)
 	if err != nil {
-		log.Fatalf("Variables of %s could not be loaded\n", templateRoot)
+		log.Fatalf("Template config file %s could not be parsed\n", configFilePath)
 	}
-	return variables
-}
-
-func getRecipes(templateRoot string) []models.Recipe {
-	recipePath := path.Join(templateRoot, "_recipes.json")
-
-	recipeContent, err := ioutil.ReadFile(recipePath)
-	if err != nil {
-		log.Fatalf("Template %s has no recipes defined\n", templateRoot)
-	}
-
-	var recipes []models.Recipe
-	err = json.Unmarshal([]byte(recipeContent), &recipes)
-	if err != nil {
-		log.Fatalf("Recipes of %s could not be loaded\n", templateRoot)
-	}
-	return recipes
-}
-
-func defineVariables(variableNames []string, args []string ) map[string]string {
-	variables := map[string]string{}
-	reader := bufio.NewReader(os.Stdin)
-
-	for i, v := range variableNames {
-		if len(args) > i {
-			variables[v] = args[i]
-		} else {
-			fmt.Printf("%s: ", v)
-			val, _ := reader.ReadString('\n')
-			val = strings.Trim(val, " \n\t\r")
-			variables[v] = val
-		}
-	}
-
-	return variables
+	return template
 }

@@ -1,6 +1,6 @@
 package models
 
 type Template struct {
-	Variables []string
-	Recipes   []Recipe
+	Variables []Variable `json:"variables"`
+	Recipes   []Recipe   `json:"recipes"`
 }

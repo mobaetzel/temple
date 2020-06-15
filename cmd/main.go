@@ -13,5 +13,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	services.LoadTemplate(args[1], args[2], args[3:])
+	templateRoot := args[1]
+	destination := args[2]
+	definitions := args[3:]
+
+	template := services.LoadTemplate(templateRoot)
+	definedVariables := services.DefineVariables(template, definitions)
+
+	services.ProcessTemplate(templateRoot, template, definedVariables, destination)
 }

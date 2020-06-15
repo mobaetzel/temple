@@ -3,16 +3,23 @@ package services
 import (
 	"bytes"
 	"github.com/mobaetzel/temple/src/models"
-	"text/template"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
+	"text/template"
 )
 
-func ProcessRecipe(templateFolder, destination string, recipe models.Recipe, variables map[string]string) {
-	templateFilePath := path.Join(templateFolder, recipe.Template)
-	fileDestinationPath := path.Join(destination, recipe.Destination)
+// Process a template.
+func ProcessTemplate(templateRoot string, tmpl models.Template, definitions models.VariableDefinitions, destination string) {
+	for _, recipe := range tmpl.Recipes {
+		processRecipe(templateRoot, destination, recipe, definitions)
+	}
+}
+
+func processRecipe(templateFolder, destination string, recipe models.Recipe, definitions map[string]string) {
+	templateFilePath := path.Join(templateFolder, recipe.TemplatePath)
+	fileDestinationPath := path.Join(destination, recipe.DestinationPath)
 
 	templateContent, err := ioutil.ReadFile(templateFilePath)
 	if err != nil {
@@ -25,7 +32,7 @@ func ProcessRecipe(templateFolder, destination string, recipe models.Recipe, var
 	}
 
 	var fileContent bytes.Buffer
-	err = destinationFileTemplate.Execute(&fileContent, variables)
+	err = destinationFileTemplate.Execute(&fileContent, definitions)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +43,7 @@ func ProcessRecipe(templateFolder, destination string, recipe models.Recipe, var
 	}
 
 	var filePathContent bytes.Buffer
-	err = fileDestinationPathTemplate.Execute(&filePathContent, variables)
+	err = fileDestinationPathTemplate.Execute(&filePathContent, definitions)
 	if err != nil {
 		log.Fatal(err)
 	}
