@@ -1,0 +1,19 @@
+{
+  "variables": [
+    "widget_name"
+  ],
+  "recipes": [
+    {
+      "template": "templates/view.dart",
+      "destination": "{{widget_name}}/{{widget_name}}.dart"
+    },
+    {
+      "template": "templates/controller.dart",
+      "destination": "{{widget_name}}/{{widget_name}}_controller.dart"
+    },
+    {
+      "template": "templates/view_model.dart",
+      "destination": "{{widget_name}}/{{widget_name}}_view_model.dart"
+    }
+  ]
+}

@@ -9,9 +9,16 @@ func main() {
 	args := os.Args
 
 	if len(args) < 3 {
-		println("Usage: temple PATH/TO/TEMPLATE DESTINATION [...VARIABLES]")
+		println("Usage: temple PATH/TO/TEMPLATE DESTINATION [VARIABLE=VALUE...]")
 		os.Exit(1)
 	}
 
-	services.LoadTemplate(args[1], args[2], args[3:])
+	templateRoot := args[1]
+	destination := args[2]
+	definitions := args[3:]
+
+	template := services.LoadTemplate(templateRoot)
+	definedVariables := services.DefineVariables(template, definitions)
+
+	services.ProcessTemplate(templateRoot, template, definedVariables, destination)
 }

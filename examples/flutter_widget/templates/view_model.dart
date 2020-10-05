@@ -1,3 +1,3 @@
-class {{.widget_name}}ViewModel {
+class {{widget_name}}ViewModel {
     String test = "test";
 }

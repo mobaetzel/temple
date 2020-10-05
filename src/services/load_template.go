@@ -1,62 +1,41 @@
 package services
 
 import (
-	"bufio"
 	"encoding/json"
-	"fmt"
 	"github.com/mobaetzel/temple/src/models"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"strings"
 )
 
-func LoadTemplate(templateRoot, destination string, args []string) {
-	_, err := os.Stat(templateRoot)
+const TemplateConfigFileName = ".template.json"
+
+// Load a template by its path.
+func LoadTemplate(templateRoot string) models.Template {
+	checkTemplateFolder(templateRoot)
+	return parseTemplateConfig(templateRoot)
+}
+
+// Check if the given template folder exists and contains a template config file.
+func checkTemplateFolder(templateRoot string) {
+	_, err := os.Stat(path.Join(templateRoot, TemplateConfigFileName))
 	if err != nil {
-		log.Fatalf("Failed to load template: %s\n", templateRoot)
+		log.Fatalf("failed to load template: %s\n", templateRoot)
 	}
+}
 
-	variablesPath := path.Join(templateRoot, "_variables.json")
-	recipePath := path.Join(templateRoot, "_recipes.json")
-
-	variablesContent, err := ioutil.ReadFile(variablesPath)
+// Load the template config file and parse the content into a template model.
+func parseTemplateConfig(templateRoot string) models.Template {
+	configFilePath := path.Join(templateRoot, TemplateConfigFileName)
+	configFileContent, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		log.Fatalf("Template %s has no variables defined\n", templateRoot)
+		log.Fatalf("could not read the template config file %s\n", configFilePath)
 	}
-	recipeContent, err := ioutil.ReadFile(recipePath)
+	var template models.Template
+	err = json.Unmarshal(configFileContent, &template)
 	if err != nil {
-		log.Fatalf("Template %s has no recipes defined\n", templateRoot)
+		log.Fatalf("template config file %s could not be parsed\n", configFilePath)
 	}
-
-	var variableNames []string
-	err = json.Unmarshal([]byte(variablesContent), &variableNames)
-	if err != nil {
-		log.Fatalf("Variables of %s could not be loaded\n", templateRoot)
-	}
-
-	var recipes []models.Recipe
-	err = json.Unmarshal([]byte(recipeContent), &recipes)
-	if err != nil {
-		log.Fatalf("Recipes of %s could not be loaded\n", templateRoot)
-	}
-
-	variables := map[string]string{}
-	reader := bufio.NewReader(os.Stdin)
-
-	for i, v := range variableNames {
-		if len(args) > i {
-			variables[v] = args[i]
-		} else {
-			fmt.Printf("%s: ", v)
-			val, _ := reader.ReadString('\n')
-			val = strings.Trim(val, " \n\t\r")
-			variables[v] = val
-		}
-	}
-
-	for _, r := range recipes {
-		ProcessRecipe(templateRoot, destination, r, variables)
-	}
+	return template
 }
