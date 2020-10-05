@@ -12,9 +12,9 @@ import (
 // Defined all variables of a given template.
 // This parses the passed args and asks the invoking user for all remaining variables.
 func DefineVariables(template models.Template, args []string) models.VariableDefinitions {
-	variables := map[string]string{}
-	reader := bufio.NewReader(os.Stdin)
+	variables := models.VariableDefinitions{}
 
+	// Read all passed arguments, split them at the equal sign and add them to the definitions.
 	for _, arg := range args {
 		parts := strings.Split(arg, "=")
 		if len(parts) > 2 {
@@ -26,6 +26,9 @@ func DefineVariables(template models.Template, args []string) models.VariableDef
 		}
 	}
 
+	// Go over the variables of the template and check they are already filled in.
+	// If they are not set, prompt the user for input.
+	reader := bufio.NewReader(os.Stdin)
 	for _, variable := range template.Variables {
 		_, ok := variables[variable]
 		if !ok {

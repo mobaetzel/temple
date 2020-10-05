@@ -17,11 +17,11 @@ func LoadTemplate(templateRoot string) models.Template {
 	return parseTemplateConfig(templateRoot)
 }
 
-// Check if the given template exists.
+// Check if the given template folder exists and contains a template config file.
 func checkTemplateFolder(templateRoot string) {
 	_, err := os.Stat(path.Join(templateRoot, TemplateConfigFileName))
 	if err != nil {
-		log.Fatalf("Failed to load template: %s\n", templateRoot)
+		log.Fatalf("failed to load template: %s\n", templateRoot)
 	}
 }
 
@@ -30,12 +30,12 @@ func parseTemplateConfig(templateRoot string) models.Template {
 	configFilePath := path.Join(templateRoot, TemplateConfigFileName)
 	configFileContent, err := ioutil.ReadFile(configFilePath)
 	if err != nil {
-		log.Fatalf("Could not read the template config file %s\n", configFilePath)
+		log.Fatalf("could not read the template config file %s\n", configFilePath)
 	}
 	var template models.Template
 	err = json.Unmarshal(configFileContent, &template)
 	if err != nil {
-		log.Fatalf("Template config file %s could not be parsed\n", configFilePath)
+		log.Fatalf("template config file %s could not be parsed\n", configFilePath)
 	}
 	return template
 }

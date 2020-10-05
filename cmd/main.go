@@ -9,7 +9,7 @@ func main() {
 	args := os.Args
 
 	if len(args) < 3 {
-		println("Usage: temple PATH/TO/TEMPLATE DESTINATION [...VARIABLES]")
+		println("Usage: temple PATH/TO/TEMPLATE DESTINATION [VARIABLE=VALUE...]")
 		os.Exit(1)
 	}
 

@@ -1,13 +1,12 @@
 package services
 
 import (
-	"bytes"
+	"github.com/cbroglie/mustache"
 	"github.com/mobaetzel/temple/src/models"
 	"io/ioutil"
 	"log"
 	"os"
 	"path"
-	"text/template"
 )
 
 // Process a template.
@@ -17,46 +16,44 @@ func ProcessTemplate(templateRoot string, tmpl models.Template, definitions mode
 	}
 }
 
-func processRecipe(templateFolder, destination string, recipe models.Recipe, definitions map[string]string) {
+// Process a single recipe from a template.
+func processRecipe(templateFolder, destination string, recipe models.Recipe, definitions models.VariableDefinitions) {
 	templateFilePath := path.Join(templateFolder, recipe.TemplatePath)
 	fileDestinationPath := path.Join(destination, recipe.DestinationPath)
 
+	// Load the content of the template file of this recipe.
 	templateContent, err := ioutil.ReadFile(templateFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	destinationFileTemplate, err := template.New(templateFilePath).Parse(string(templateContent))
+	// Render the template content with the given variable definitions.
+	fileContent, err := renderString(string(templateContent), definitions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	var fileContent bytes.Buffer
-	err = destinationFileTemplate.Execute(&fileContent, definitions)
+	// Render the template path with the fiven variable definitions.
+	filePath, err := renderString(fileDestinationPath, definitions)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fileDestinationPathTemplate, err := template.New(fileDestinationPath).Parse(fileDestinationPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var filePathContent bytes.Buffer
-	err = fileDestinationPathTemplate.Execute(&filePathContent, definitions)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	filePath := filePathContent.String()
+	// Create destination directory tree.
 	dir := path.Dir(filePath)
 	err = os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = ioutil.WriteFile(filePath, fileContent.Bytes(), os.ModePerm)
+	// Write destination file of this recipe.
+	err = ioutil.WriteFile(filePath, []byte(fileContent), os.ModePerm)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// Render a single string with a given set of variable definitions.
+func renderString(content string, definitions models.VariableDefinitions) (string, error) {
+	return mustache.Render(content, definitions)
 }
